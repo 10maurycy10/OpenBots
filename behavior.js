@@ -35,7 +35,7 @@ function init_work(con,ws) {
     
     // SEND A CHAT
     chat_timer = setInterval(() => {
-        if (CHAT_MESSAGE !== "") {
+        if (config.CHAT_MESSAGE !== "") {
             send(ws,{
                 chat: config.CHAT_MESSAGE
             })

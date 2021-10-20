@@ -1,7 +1,7 @@
 // Configuration options
 
 // must be over 0
-module.exports.BOT_COUNT = 400
+module.exports.BOT_COUNT = 10
 
 // ping interval should be 500 to resemble a player
 module.exports.PING_INTERVAl = 1000
