@@ -6,7 +6,10 @@ function createInput() {
 module.exports.createInput = createInput;
 
 //utility to send data to server
-module.exports.send = (ws,x) => ws.send(messagepack.encode(x))
+module.exports.send = (ws,x) => {
+    tx_total ++;
+    return ws.send(messagepack.encode(x))
+}
 
 // a small player info object
 module.exports.CPlayer = (pack) => { //the new keyword suck. avoid at all costs

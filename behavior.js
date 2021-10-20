@@ -9,6 +9,7 @@ function update_players(state,players,con) {
 }
 
 function processMessage(msg,con,state) {
+    rx_total++;
 	let  obj = messagepack.decode(new Uint8Array(msg.data));
     if (obj.type === 'init') {
         con.id = obj.selfId;
@@ -27,12 +28,15 @@ function processMessage(msg,con,state) {
 	}
 }
 
+// initalze the connection
 function init(con,state) {
     let ws = con.socket;
     
     let delay = Math.floor(Math.random() * 1000);
     
-    send(ws,{chat: `/name ${config.NAME}`})
+    if (config.NAME !== "") {
+        send(ws,{chat: `/name ${config.NAME}`})
+    }
     
     con.init = true
     
@@ -86,6 +90,7 @@ function init_work(con,ws) {
         dbg('Disconnected.')
         clearInterval(chat_timer)
         clearInterval(ping_timer)
+        clearInterval(move_timer)
         clearInterval(fire_timer)
         con.open = false;
     }

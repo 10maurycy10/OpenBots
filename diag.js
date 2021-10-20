@@ -1,3 +1,6 @@
+rx_last = 0
+tx_last = 0
+
 module.exports.getstats = (array,state) => {
     let notconnected = 0
     let connected = 0;
@@ -20,6 +23,12 @@ module.exports.getstats = (array,state) => {
         i ++
     }
     
-    dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected}`)
+    let d_rx = rx_total - rx_last
+    let d_tx = tx_total - tx_last
+    
+    dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected} | TX ${d_tx*2} | RX ${d_rx*2}`)
+    
+    rx_last = rx_total
+    tx_last = tx_total
     //console.log(state)
 }
