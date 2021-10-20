@@ -1,7 +1,7 @@
 // Configuration options
 
 // must be over 0
-module.exports.BOT_COUNT = 5 
+module.exports.BOT_COUNT = parseInt(process.env.BOT_COUNT) || 5 
 
 // ping interval should be 500 to resemble a player
 module.exports.PING_INTERVAl = 500
@@ -38,11 +38,11 @@ if (process.platform == "win32") {
 }
 
 if (process.platform == "darwin") {
-    module.exports.CHATS.push("Careful, this computer is very expencive!")
+    module.exports.CHATS.push("Careful, this computer is very expensive!")
 }
 
-module.exports.WEB_SERVER = true
+module.exports.WEB_SERVER = process.env.WEB_SERVER || false
 
 module.exports.WEB_SERVER_PORT = process.env.PORT || 3000
 
-module.exports.MOVE_RANDOM_WALK_TIME =  500
+module.exports.MOVE_RANDOM_WALK_TIME = parseInt(process.env.MOVE_RANDOM_WALK_TIME) ||  500
