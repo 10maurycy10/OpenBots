@@ -1,8 +1,8 @@
 module.exports.getstats = (array,state) => {
-    notconnected = 0
-    connected = 0;
-    inited = 0;
-    disconnected = 0;
+    let notconnected = 0
+    let connected = 0;
+    let inited = 0;
+    let disconnected = 0;
     
     i = 0
     while (i < config.BOT_COUNT) {

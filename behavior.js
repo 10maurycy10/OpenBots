@@ -9,7 +9,7 @@ function update_players(state,players,con) {
 }
 
 function processMessage(msg,con,state) {
-	const obj = messagepack.decode(new Uint8Array(msg.data));
+	let  obj = messagepack.decode(new Uint8Array(msg.data));
     if (obj.type === 'init') {
         con.id = obj.selfId;
         for ({ data, id } of obj.players) {
@@ -28,9 +28,9 @@ function processMessage(msg,con,state) {
 }
 
 function init(con,state) {
-    ws = con.socket;
+    let ws = con.socket;
     
-    delay = Math.floor(Math.random() * 1000);
+    let delay = Math.floor(Math.random() * 1000);
     
     send(ws,{chat: `/name ${config.NAME}`})
     
@@ -39,23 +39,17 @@ function init(con,state) {
     ws.addEventListener('message', (msg) => {
         processMessage(msg,con,state)
     });
-    ws.onclose = function() {
-        dbg('Disconnected.')
-        clearInterval(chat_timer)
-        clearInterval(ping_timer)
-        con.open = false;
-    }
     if (config.DO_STUFF)
         setTimeout(init_work,delay,con,ws)
 }
 
 function init_work(con,ws) {
     // ping the server 2 per second
-    ping_timer = setInterval(() => {
+    let ping_timer = setInterval(() => {
         send(ws,{ping: Date.now() - config.FAKE_LAG})
     }, config.PING_INTERVAl)
     // SEND A CHAT
-    chat_timer = setInterval(() => {
+    let chat_timer = setInterval(() => {
         if (config.CHATS.length > 0) {
             send(ws,{
                 chat: config.CHATS[Math.floor(Math.random() * config.CHATS.length)]
@@ -63,19 +57,38 @@ function init_work(con,ws) {
         }
     },config.CHAT_INTERAVL)
     
-    // FIRE!!!
-    chat_timer = setInterval(() => {
+    let movingDirection = null;
+    let loading = false;
+    
+    function update_input() {
         let input = lib.createInput();
-        input.space = true
-        const move_direction = config.MOVES[Math.floor(Math.random() * config.MOVES.length)];
-        input[move_direction] = true;
-        input.arrowRight = true
+        input[movingDirection ?? config.MOVES[0]] = true;
+        input["space"] = loading;
+        input["arrowRight"] = loading;
         send(ws,{input: true, data: input})
+    }
+    
+    let move_timer = setInterval(() => {
+        movingDirection = config.MOVES[Math.floor(Math.random() * config.MOVES.length)]
+        update_input()
+    },config.MOVE_RANDOM_WALK_TIME)
+    
+    // FIRE!!!
+    let fire_timer = setInterval(() => {
+        loading = true
+        update_input();
         setTimeout(() => {
-            input.space = false
-            send(ws,{input: true, data: input})
+            loading = false
+            update_input()
         },1000)
     },1100)
+    ws.onclose = function() {
+        dbg('Disconnected.')
+        clearInterval(chat_timer)
+        clearInterval(ping_timer)
+        clearInterval(fire_timer)
+        con.open = false;
+    }
 }
 
 module.exports.init = init

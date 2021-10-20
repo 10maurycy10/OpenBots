@@ -46,3 +46,5 @@ if (process.platform == "darwin") {
 module.exports.WEB_SERVER = true
 
 module.exports.WEB_SERVER_PORT = process.env.PORT || 3000
+
+module.exports.MOVE_RANDOM_WALK_TIME = 500
