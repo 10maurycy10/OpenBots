@@ -24,7 +24,7 @@ const app = express()
 const port =  config.WEB_SERVER_PORT
 
     app.get('/', (req, res) => {
-        res.send('This is the openbots web serber')
+        res.send('This is the openbots web server. This can be used for uptime monitoring and preventing dyno/runner sleep in heroku/replit')
     })
     app.listen(port, () => {
         console.log(`internal web server http://localhost:${port}`)
