@@ -1,5 +1,5 @@
 WebSocket = require("ws")
-messagepack = require("messagepack")
+messagepack = require("msgpack-lite")
 
 config = require("./config.js")
 diag = require("./diag.js")

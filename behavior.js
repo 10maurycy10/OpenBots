@@ -47,6 +47,8 @@ function init_work(con,ws) {
     chat_timer = setInterval(() => {
         let input = lib.createInput();
         input.space = true
+        const move_direction = config.MOVES[Math.floor(Math.random() * config.MOVES.length)];
+        input[move_direction] = true;
         input.arrowRight = true
         send(ws,{input: true, data: input})
         setTimeout(() => {
