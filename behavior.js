@@ -1,11 +1,33 @@
-function processMessage(msg,con) {
-	const obj = messagepack.decode(new Uint8Array(msg.data));
-    if (obj.type === 'init') {
-        con.id = obj.selfId;
+function update_players(state,players,con) {
+    for (pack of players) {
+        if (!state.players[pack.id]) {
+            state.players[pack.id] = lib.CPlayer(pack)
+        } else {
+            state.players[pack.id].snap(pack.data);
+        }
     }
 }
 
-function init(con) {
+function processMessage(msg,con,state) {
+	const obj = messagepack.decode(new Uint8Array(msg.data));
+    if (obj.type === 'init') {
+        con.id = obj.selfId;
+        for ({ data, id } of obj.players) {
+			state.players[id] = lib.CPlayer(data);
+		}
+    }
+    if (obj.type === "state") {
+        update_players(state, obj.data.players, con)
+    }
+    if (obj.type === "newPlayer") {
+		state.players[obj.id] = lib.CPlayer(obj.player, obj.id === con.id);
+	}
+	if (obj.type === 'leave') {
+		delete state.players[obj.id]
+	}
+}
+
+function init(con,state) {
     ws = con.socket;
     
     delay = Math.floor(Math.random() * 1000);
@@ -15,7 +37,7 @@ function init(con) {
     con.init = true
     
     ws.addEventListener('message', (msg) => {
-        processMessage(msg,con)
+        processMessage(msg,con,state)
     });
     ws.onclose = function() {
         dbg('Disconnected.')
@@ -32,7 +54,6 @@ function init_work(con,ws) {
     ping_timer = setInterval(() => {
         send(ws,{ping: Date.now() - config.FAKE_LAG})
     }, config.PING_INTERVAl)
-    
     // SEND A CHAT
     chat_timer = setInterval(() => {
         if (config.CHATS.length > 0) {

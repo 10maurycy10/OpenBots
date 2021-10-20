@@ -7,3 +7,18 @@ module.exports.createInput = createInput;
 
 //utility to send data to server
 module.exports.send = (ws,x) => ws.send(messagepack.encode(x))
+
+// a small player info object
+module.exports.CPlayer = (pack) => { //the new keyword suck. avoid at all costs
+    // this avoids alocation
+    init_player_data = (player,pack) => {
+        player.x = pack.x ?? player.x;
+        player.y = pack.y ?? player.y;
+        player.dying = pack.dying ?? player.dying;
+        player.radius = pack.radius ?? player.radius;
+    }
+    unpacked = {}
+    unpacked.snap = (pack) => init_player_data(unpacked,pack)
+    init_player_data(unpacked,pack)
+    return unpacked
+}

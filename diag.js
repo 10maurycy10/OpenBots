@@ -1,4 +1,4 @@
-module.exports.getstats = (array) => {
+module.exports.getstats = (array,state) => {
     notconnected = 0
     connected = 0;
     inited = 0;
@@ -21,4 +21,5 @@ module.exports.getstats = (array) => {
     }
     
     dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected}`)
+    //console.log(state)
 }

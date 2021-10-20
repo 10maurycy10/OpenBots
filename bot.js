@@ -9,11 +9,12 @@ behavior = require("./behavior.js")
 
 dbg = (x) => console.info(x)
 send = lib.send
+state = {players: []}
 
 // Connect to server
 cons = []
-setInterval(connect.connect,1000,cons,behavior.init)
+setInterval(connect.connect,1000,cons,behavior.init,state)
 
 // print stats
-setInterval(diag.getstats,500,cons)
+setInterval(diag.getstats,500,cons,state)
 
