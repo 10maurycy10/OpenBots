@@ -20,10 +20,10 @@ module.exports.DO_STUFF = true
 
 module.exports.MOVES = ["up", "right", "left", "down"]
 
-//module.exports.ADDRESS = "ws://darrows.herokuapp.com"
+module.exports.ADDRESS = "ws://darrows.herokuapp.com"
 
 // uncomment to connect to local instance
-module.exports.ADDRESS = "ws://localhost:5000"
+//module.exports.ADDRESS = "ws://localhost:5000"
 
 module.exports.CHATS = ["ICANHASBOT", "over 158 lines of code", "no monkeys in the loop", "KILL ALL HUMANS", "stay still for a moment", "lagggggggg", "[SEGMENTATION FAULT]", "jk", "let me pass", "[BIG RED BUTTON]", "100% artificial", "go watch a cat video", "https://github.com/10maurycy10/OpenBots"]
 
