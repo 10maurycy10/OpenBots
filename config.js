@@ -20,10 +20,8 @@ module.exports.DO_STUFF = true
 
 module.exports.MOVES = ["up", "right", "left", "down"]
 
-module.exports.ADDRESS = "ws://darrows.herokuapp.com"
-
-// uncomment to connect to local instance
-//module.exports.ADDRESS = "ws://localhost:5000"
+// set env var to specify target 
+module.exports.ADDRESS = process.env.TARGET || "ws://localhost:5000"
 
 module.exports.CHATS = ["ICANHASBOT", "over 158 lines of code", "no monkeys in the loop", "KILL ALL HUMANS", "stay still for a moment", "lagggggggg", "[SEGMENTATION FAULT]", "jk", "let me pass", "[BIG RED BUTTON]", "100% artificial", "go watch a cat video", "https://github.com/10maurycy10/OpenBots"]
 
@@ -47,4 +45,4 @@ module.exports.WEB_SERVER = true
 
 module.exports.WEB_SERVER_PORT = process.env.PORT || 3000
 
-module.exports.MOVE_RANDOM_WALK_TIME = 500
+module.exports.MOVE_RANDOM_WALK_TIME =  500
