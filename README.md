@@ -2,9 +2,7 @@
 
 A simple node js program to bot a darrows server.
 
-bot.js has the address of the server
-
-most other configs arre in config.js
+configs arre in config.js
 
 ## running
 

@@ -35,11 +35,10 @@ function init_work(con,ws) {
     
     // SEND A CHAT
     chat_timer = setInterval(() => {
-        if (config.CHAT_MESSAGE !== "") {
+        if (config.CHATS.length > 0) {
             send(ws,{
-                chat: config.CHAT_MESSAGE
+                chat: config.CHATS[Math.floor(Math.random() * config.CHATS.length)]
             })
-            //dbg("CHAT " + (con.id || "None").toString())
         }
     },config.CHAT_INTERAVL)
     

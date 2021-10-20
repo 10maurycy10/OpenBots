@@ -1,7 +1,7 @@
 // Configuration options
 
 // must be over 0
-module.exports.BOT_COUNT = 10
+module.exports.BOT_COUNT = 5
 
 // ping interval should be 500 to resemble a player
 module.exports.PING_INTERVAl = 500
@@ -10,14 +10,11 @@ module.exports.PING_INTERVAl = 500
 // set to a low number (1) to cary out a chat flood
 module.exports.CHAT_INTERAVL = 1000
 
-// set this to blank to prevent sending
-module.exports.CHAT_MESSAGE = "Open bots!!"
-
 // artifical latency added to pings
 // set this to non zero to induce lag?
 module.exports.FAKE_LAG = 0
 
-module.exports.NAME = "OpenBots"
+module.exports.NAME = "OpenBot"
 
 module.exports.DO_STUFF = true
 
@@ -27,3 +24,17 @@ module.exports.ADDRESS = "ws://darrows.herokuapp.com"
 
 // uncomment to connect to local instance
 //module.exports.ADDRESS = "ws://localhost:5000"
+
+module.exports.CHATS = ["ICANHASBOT", "over 158 lines of code", "no monkeys in the loop", "KILL ALL HUMANS", "stay still for a moment", "lagggggggg", "[SEGMENTATION FAULT]", "jk", "let me pass", "[BIG RED BUTTON]", "100% artificial", "go watch a cat video"]
+
+if (process.platform == "linux") {
+    module.exports.CHATS.push("Linux, and proud of it!")
+}
+
+if (process.platform == "freebsd" || process.platform == "openbsd") {
+    module.exports.CHATS.push("What is this, BSD?")
+}
+
+if (process.platform == "win32") {
+    module.exports.CHATS.push("WTF is this, MSDOS?")
+}
