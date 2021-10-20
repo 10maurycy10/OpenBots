@@ -11,12 +11,12 @@ module.exports.PING_INTERVAl = 1000
 module.exports.CHAT_INTERAVL = 1000
 
 // set this to blank to prevent sending
-module.exports.CHAT_MESSAGE = "NO MORE BOTS"
+module.exports.CHAT_MESSAGE = "Open bots!!"
 
 // artifical latency added to pings
 // set this to non zero to induce lag
 module.exports.FAKE_LAG = 0
 
-module.exports.NAME = "trollololo"
+module.exports.NAME = "OpenBots"
 
-module.exports.DO_STUFF = false
+module.exports.DO_STUFF = true

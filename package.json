@@ -1,5 +1,5 @@
 {
-  "name": "arrowsbot",
+  "name": "openarrowsbot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,10 +8,10 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "messagepack": "^1.1.12",
-    "msgpack-lite": "^0.1.26",,
+    "msgpack-lite": "^0.1.26",
     "ws": "^7.5.5"
   }
 }

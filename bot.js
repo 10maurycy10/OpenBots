@@ -17,9 +17,3 @@ setInterval(connect.connect,1000,cons,behavior.init)
 // print stats
 setInterval(diag.getstats,500,cons)
 
-function processMessage(msg,con) {
-	const obj = messagepack.decode(new Uint8Array(msg.data));
-    if (obj.type === 'init') {
-        con.id = obj.selfId;
-    }
-}
