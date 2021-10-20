@@ -46,3 +46,5 @@ module.exports.WEB_SERVER = process.env.WEB_SERVER || false
 module.exports.WEB_SERVER_PORT = process.env.PORT || 3000
 
 module.exports.MOVE_RANDOM_WALK_TIME = parseInt(process.env.MOVE_RANDOM_WALK_TIME) ||  500
+
+//console.log(module.exports)
