@@ -1,5 +1,6 @@
 WebSocket = require("ws")
 messagepack = require("msgpack-lite")
+express = require("express")
 
 config = require("./config.js")
 diag = require("./diag.js")
@@ -18,3 +19,14 @@ setInterval(connect.connect,1000,cons,behavior.init,state)
 // print stats
 setInterval(diag.getstats,500,cons,state)
 
+if (config.WEB_SERVER) {
+const app = express()
+const port =  config.WEB_SERVER_PORT
+
+    app.get('/', (req, res) => {
+        res.send('This is the openbots web serber')
+    })
+    app.listen(port, () => {
+        console.log(`internal web server http://localhost:${port}`)
+    })
+}

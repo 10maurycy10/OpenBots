@@ -42,3 +42,7 @@ if (process.platform == "win32") {
 if (process.platform == "darwin") {
     module.exports.CHATS.push("Careful, this computer is very expencive!")
 }
+
+module.exports.WEB_SERVER = true
+
+module.exports.WEB_SERVER_PORT = process.env.PORT || 3000
