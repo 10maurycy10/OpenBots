@@ -30,5 +30,4 @@ module.exports.getstats = (array,state) => {
     
     rx_last = rx_total
     tx_last = tx_total
-    //console.log(state)
 }

@@ -19,6 +19,7 @@ function processMessage(msg,con,state) {
 	let  obj = messagepack.decode(new Uint8Array(msg.data));
     if (obj.type === 'init') {
         con.id = obj.selfId;
+        state.bots[con.id] = con;
         for ({ data, id } of obj.players) {
 			state.players[id] = lib.CPlayer(data);
 		}
@@ -109,7 +110,7 @@ function init_work(con,ws) {
         let target_d = Number.MAX_VALUE;
         
         for (var id in state.players) {
-            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id) {
+            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id && !(id in state.bots)) {
                 player = state.players[id]
                 let dx = Math.abs(player.x - con.x)
                 let dy = Math.abs(player.y - con.y)

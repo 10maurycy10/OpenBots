@@ -56,3 +56,5 @@ if (process.env.LOG_CONF) {
 }
 
 module.exports.DONT_AIM = "true" === process.env.DONT_AIM || false
+
+module.exports.ATTACK_SELF = process.env.ATTACK_SELF == "true"
