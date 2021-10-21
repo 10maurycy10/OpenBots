@@ -24,7 +24,7 @@ config = {
     WEB_SERVER: false,
     MOVE_RANDOM_WALK_TIME: 500,
     DONT_AIM: false,
-    ATTACK_SELF: false,
+    DONT_ATTACK_SELF: true,,
     // the is how mutch the bot will reotate per second
     ARROWING_ANGULAR_SPEED: 2.9,
     SERVER_TICKS_MS: 16
