@@ -6,6 +6,12 @@ function update_players(state,players,con) {
             state.players[pack.id].snap(pack.data);
         }
     }
+    // maintain updated self info
+    if (state.players[con.id]) {
+        con.x = state.players[con.id].x ?? null
+        con.y = state.players[con.id].y ?? null
+        con.angle = state.players[con.id].angle ?? null
+    }
 }
 
 function processMessage(msg,con,state) {
@@ -63,15 +69,62 @@ function init_work(con,ws) {
     
     let movingDirection = null;
     let loading = false;
+    let arrow_direction = null;
     
     function update_input() {
         let input = lib.createInput();
         input[movingDirection ?? config.MOVES[0]] = true;
         input["space"] = loading;
-        input["arrowRight"] = loading;
+        
+        if (arrow_direction) input[arrow_direction] = true;
+        
         send(ws,{input: true, data: input})
     }
     
+    function update_aim(target_x, target_y) {
+        
+        if (config.DONT_AIM) {
+            arrow_direction = "arrowRight";
+            return
+        }
+        
+        if (!con.x) {
+            return;
+        }
+        
+        target = Math.atan2(con.y-target_y,con.x-target_x)
+        error = (((target - con.angle) + Math.PI*2) % (Math.PI*2)) - Math.PI
+        
+        if (error > 0)
+            arrow_direction = "arrowRight";
+        else
+            arrow_direction = "arrowLeft";
+        
+        update_input()
+    }
+    
+    let input_timer = setInterval(() => {
+        let target_x = 0;
+        let target_y = 0;
+        let target_d = Number.MAX_VALUE;
+        
+        for (var id in state.players) {
+            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id) {
+                player = state.players[id]
+                let dx = Math.abs(player.x - con.x)
+                let dy = Math.abs(player.y - con.y)
+                let d  = Math.sqrt(dx*dx+dy*dy)
+                if (d < target_d) {
+                    target_d = d
+                    target_x = player.x
+                    target_y = player.y
+                }
+            }
+        }
+        
+        update_aim(target_x,target_y)
+    },100)
+
     let move_timer = setInterval(() => {
         movingDirection = config.MOVES[Math.floor(Math.random() * config.MOVES.length)]
         update_input()
@@ -84,14 +137,16 @@ function init_work(con,ws) {
         setTimeout(() => {
             loading = false
             update_input()
-        },1000)
-    },1100)
+        },config.DONT_AIM ? 1000 : 2000)
+    },config.DONT_AIM ? 1100 : 2200)
+    
     ws.onclose = function() {
         dbg('Disconnected.')
         clearInterval(chat_timer)
         clearInterval(ping_timer)
         clearInterval(move_timer)
         clearInterval(fire_timer)
+        clearInterval(input_timer)
         con.open = false;
     }
 }

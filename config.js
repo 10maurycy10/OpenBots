@@ -44,7 +44,7 @@ if (process.platform == "darwin") {
 }
 
 // Should the script have a web server
-module.exports.WEB_SERVER = process.env.WEB_SERVER || false
+module.exports.WEB_SERVER = process.env.WEB_SERVER === "true" || false
 
 module.exports.WEB_SERVER_PORT = process.env.PORT || 3000
 
@@ -54,3 +54,5 @@ module.exports.MOVE_RANDOM_WALK_TIME = parseInt(process.env.MOVE_RANDOM_WALK_TIM
 if (process.env.LOG_CONF) {
     console.log(module.exports)
 }
+
+module.exports.DONT_AIM = "true" === process.env.DONT_AIM || false
