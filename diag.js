@@ -28,9 +28,6 @@ module.exports.getstats = (array,state) => {
     
     dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected} | TX ${d_tx*2} | RX ${d_rx*2} | PING ${state.ping}`)
     
-    dbg(state.players)
-    dbg(config.IGNORED_NAMES)
-    
     rx_last = rx_total
     tx_last = tx_total
 }

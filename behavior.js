@@ -11,6 +11,7 @@ function update_players(state,players,con) {
         con.x = state.players[con.id].x ?? null
         con.y = state.players[con.id].y ?? null
         con.angle = state.players[con.id].angle ?? null
+        con.dead = state.players[con.id].dead ?? null
     }
 }
 
@@ -29,10 +30,12 @@ function processMessage(msg,con,state) {
     }
     if (obj.type === "newPlayer") {
 		state.players[obj.id] = lib.CPlayer(obj.player, obj.id === con.id);
-	}
+    }
 	if (obj.type === 'leave') {
 		delete state.players[obj.id]
-	}
+        if (obj.id == con.id)
+            send(con.socket,{type: "spawn"})
+    }
     if (obj.pung != undefined) {
 		state.ping = Math.round((Date.now() - obj.pung) / 2)
 	}
