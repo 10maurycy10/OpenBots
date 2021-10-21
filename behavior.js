@@ -96,7 +96,7 @@ function init_work(con,ws) {
             return;
         }
         
-        if (con.aim_delay) {dbg("aim delay!");return;}
+        if (con.aim_delay) {return;}
         
         target = Math.atan2(con.y-target_y,con.x-target_x)
         error = (((target - con.angle) + Math.PI*2) % (Math.PI*2)) - Math.PI
@@ -115,7 +115,7 @@ function init_work(con,ws) {
         
         let angle_per_trip = config.ARROWING_ANGULAR_SPEED * seconds_round_trip
         
-        if (Math.abs(error) < angle_per_trip) {
+        if (Math.abs(error) < (angle_per_trip+5)) {
         
             let time_to_hold_input_ms = Math.abs(error / config.ARROWING_ANGULAR_SPEED * 1000)
             
