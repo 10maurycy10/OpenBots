@@ -48,15 +48,7 @@ config.WEB_SERVER_PORT = process.env.PORT || 3000
 
 for (envvar in process.env) {
     if (envvar in config) {
-        if (typeof config[envvar] == "boolean") {
-            config[envvar] = process.env[envvar] == "true"
-        }
-        if (typeof config[envvar] == "number") {
-            config[envvar] = parseInt(process.env[envvar])
-        }
-        if (typeof config[envvar] == "string") {
-            config[envvar] = process.env[envvar]
-        }
+        config[envvar] = JSON.parse(process.env[envvar])
     }
 }
 

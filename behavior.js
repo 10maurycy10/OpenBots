@@ -119,8 +119,6 @@ function init_work(con,ws) {
         
             let time_to_hold_input_ms = Math.abs(error / config.ARROWING_ANGULAR_SPEED * 1000)
             
-            if (time_to_hold_input_ms < 2) {return;}
-            
             con.aim_delay = true;
             setTimeout(() => {
                 arrow_direction = null;
@@ -167,6 +165,8 @@ function init_work(con,ws) {
             update_input()
         },config.DONT_AIM ? 1000 : 2000)
     },config.DONT_AIM ? 1100 : 2200)
+    
+    
     
     ws.onclose = function() {
         dbg('Disconnected.')
