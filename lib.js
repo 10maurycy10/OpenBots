@@ -20,6 +20,7 @@ module.exports.CPlayer = (pack) => { //the new keyword suck. avoid at all costs
         player.dying = pack.dying ?? player.dying;
         player.radius = pack.radius ?? player.radius;
         player.angle = pack.angle ?? player.angle;
+        player.name = pack.name ?? player.name;
     }
     let unpacked = {}
     unpacked.snap = (pack) => init_player_data(unpacked,pack)

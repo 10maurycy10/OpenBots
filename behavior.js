@@ -135,7 +135,7 @@ function init_work(con,ws) {
         let target_d = Number.MAX_VALUE;
         
         for (var id in state.players) {
-            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id && !((id in state.bots) && config.DONT_ATTACK_SELF )) {
+            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id && !((id in state.bots) && config.DONT_ATTACK_SELF ) && !(state.players[id].name in config.IGNORED_NAMES)) {
                 player = state.players[id]
                 let dx = Math.abs(player.x - con.x)
                 let dy = Math.abs(player.y - con.y)
