@@ -14,7 +14,7 @@ dbg = (x) => console.info(x)
 send = lib.send
 
 // shared state buffer
-state = {players: {},rx: 0, tx: 0, bots: {}}
+state = {players: {},rx: 0, tx: 0, bots: {}, ping: null}
 
 tx_total = 0;
 rx_total = 0;

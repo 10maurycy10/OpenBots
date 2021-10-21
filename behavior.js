@@ -33,6 +33,9 @@ function processMessage(msg,con,state) {
 	if (obj.type === 'leave') {
 		delete state.players[obj.id]
 	}
+    if (obj.pung != undefined) {
+		state.ping = Math.round((Date.now() - obj.pung) / 2)
+	}
 }
 
 // initalze the connection
@@ -93,6 +96,8 @@ function init_work(con,ws) {
             return;
         }
         
+        if (con.aim_delay) {dbg("aim delay!");return;}
+        
         target = Math.atan2(con.y-target_y,con.x-target_x)
         error = (((target - con.angle) + Math.PI*2) % (Math.PI*2)) - Math.PI
         
@@ -100,8 +105,30 @@ function init_work(con,ws) {
             arrow_direction = "arrowRight";
         else
             arrow_direction = "arrowLeft";
-        
+    
         update_input()
+        
+        // dont attemt good aim if ping not known
+        if (state.ping === null) return;
+        
+        let seconds_round_trip = (state.ping * 2 + config.SERVER_TICKS_MS) / 1000
+        
+        let angle_per_trip = config.ARROWING_ANGULAR_SPEED * seconds_round_trip
+        
+        if (Math.abs(error) < angle_per_trip) {
+        
+            let time_to_hold_input_ms = Math.abs(error / config.ARROWING_ANGULAR_SPEED * 1000)
+            
+            if (time_to_hold_input_ms < 2) {return;}
+            
+            con.aim_delay = true;
+            setTimeout(() => {
+                arrow_direction = null;
+                update_input()
+                con.aim_delay = false;
+            },time_to_hold_input_ms)
+            
+        }
     }
     
     let input_timer = setInterval(() => {
@@ -110,7 +137,7 @@ function init_work(con,ws) {
         let target_d = Number.MAX_VALUE;
         
         for (var id in state.players) {
-            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id && !(id in state.bots)) {
+            if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id && !((id in state.bots) && config.ATTACK_SELF )) {
                 player = state.players[id]
                 let dx = Math.abs(player.x - con.x)
                 let dy = Math.abs(player.y - con.y)
