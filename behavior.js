@@ -77,6 +77,9 @@ function init_work(con,ws) {
     let movingDirection = null;
     let loading = false;
     let arrow_direction = null;
+    let can_fire = false;
+    let time_loading = 0;
+    let aim_cycles = 0;
     
     function update_input() {
         let input = lib.createInput();
@@ -127,9 +130,22 @@ function init_work(con,ws) {
                 arrow_direction = null;
                 update_input()
                 con.aim_delay = false;
+                if (time_loading > 15) {
+                    loading = false;
+                    if (aim_cycles > config.MIN_AIM_CYCLES) { 
+                        aim_cycles = 0;
+                        time_loading = 0;
+                    } else
+                        aim_cycles ++
+                    update_input()
+                } else {
+                    let old = loading;
+                    loading = true;
+                    if (old != loading)
+                        update_input();
+                }
             },time_to_hold_input_ms)
-            
-        }
+        }        
     }
     
     let input_timer = setInterval(() => {
@@ -159,15 +175,10 @@ function init_work(con,ws) {
         update_input()
     },config.MOVE_RANDOM_WALK_TIME)
     
-    // FIRE!!!
+    // load timer!
     let fire_timer = setInterval(() => {
-        loading = true
-        update_input();
-        setTimeout(() => {
-            loading = false
-            update_input()
-        },config.DONT_AIM ? 1000 : 2000)
-    },config.DONT_AIM ? 1100 : 2200)
+            time_loading++
+    },100)
     
     
     
