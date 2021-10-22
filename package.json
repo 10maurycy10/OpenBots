@@ -14,5 +14,8 @@
     "messagepack": "^1.1.12",
     "msgpack-lite": "^0.1.26",
     "ws": "^7.5.5"
+  },
+  "devDependencies": {
+    "jshint": "^2.13.1"
   }
 }

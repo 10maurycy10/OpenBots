@@ -1,6 +1,8 @@
+/* jshint node: true, esversion: 11 */
+
 // create a NoOp input state
 function createInput() {
-	return { up: false, right: false, left: false, down: false, arrowLeft: false, arrowRight: false, space: false }
+	return { up: false, right: false, left: false, down: false, arrowLeft: false, arrowRight: false, space: false };
 }
 
 module.exports.createInput = createInput;
@@ -8,8 +10,8 @@ module.exports.createInput = createInput;
 //utility to send data to server
 module.exports.send = (ws,x) => {
     tx_total ++;
-    return ws.send(messagepack.encode(x))
-}
+    return ws.send(messagepack.encode(x));
+};
 
 // a small player info object
 module.exports.CPlayer = (pack) => { //the new keyword suck. avoid at all costs
@@ -21,9 +23,9 @@ module.exports.CPlayer = (pack) => { //the new keyword suck. avoid at all costs
         player.radius = pack.radius ?? player.radius;
         player.angle = pack.angle ?? player.angle;
         player.name = pack.name ?? player.name;
-    }
-    let unpacked = {}
-    unpacked.snap = (pack) => init_player_data(unpacked,pack)
-    init_player_data(unpacked,pack)
-    return unpacked
-}
+    };
+    let unpacked = {};
+    unpacked.snap = (pack) => init_player_data(unpacked,pack);
+    init_player_data(unpacked,pack);
+    return unpacked;
+};

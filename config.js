@@ -1,6 +1,8 @@
+/* jshint node: true, esversion: 11 */
+
 // Configuration options
 
-config = {
+let config = {
     BOT_COUNT: 5,
     // ping interval should be 500 to resemble a player
     PING_INTERVAl: 500,
@@ -29,32 +31,34 @@ config = {
     SERVER_TICKS_MS: 16,
     IGNORED_NAMES: {},
     MIN_AIM_CYCLES: 6
-}
+};
 
 // add some extra messages depending on platform
 if (process.platform == "linux") {
-    config.CHATS.push("Linux, and proud of it!")
+    config.CHATS.push("Linux, and proud of it!");
 }
 if (process.platform == "freebsd" || process.platform == "openbsd") {
-    config.CHATS.push("What is this, BSD?")
+    config.CHATS.push("What is this, BSD?");
 }
 if (process.platform == "win32") {
-    config.CHATS.push("WTF is this, MSDOS?")
+    config.CHATS.push("WTF is this, MSDOS?");
 }
 if (process.platform == "darwin") {
-   config.CHATS.push("Careful, this computer is very expensive!")
+   config.CHATS.push("Careful, this computer is very expensive!");
 }
 // this one is specal for heroku
-config.WEB_SERVER_PORT = process.env.PORT || 3000
+config.WEB_SERVER_PORT = process.env.PORT || 3000;
 
-for (envvar in process.env) {
+for (let envvar in process.env) {
     if (envvar in config) {
-        config[envvar] = JSON.parse(process.env[envvar])
+        if (process.env[envvar] !== "") {
+            config[envvar] = JSON.parse(process.env[envvar]);
+        }
     }
 }
 
-module.exports = config
+module.exports = config;
 
 if (process.env.LOG_CONF) {
-    console.log(module.exports)
+    console.log(module.exports);
 }
