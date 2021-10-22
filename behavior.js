@@ -189,14 +189,16 @@ function init_work(con,ws,state) {
     
     
     
-    ws.onclose = function() {
-        dbg('Disconnected.');
+    con.onkick = function() {
         clearInterval(input_timer);
         clearInterval(move_timer);
         clearInterval(chat_timer);
         clearInterval(ping_timer);
         con.open = false;
+        con.init = false;
     };
+    
+    ws.onclose = con.onkick
 }
 
 module.exports.init = init;
