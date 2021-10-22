@@ -1,3 +1,4 @@
+behavior.js
 /* jshint node: true, esversion: 11 */
 
 
@@ -21,8 +22,8 @@ function update_players(state,players,con) {
 function processMessage(msg,con,state) {
     rx_total++;
 	let  obj = messagepack.decode(new Uint8Array(msg.data));
-    
     if (obj.type === 'init') {
+        dbg(init)
         con.id = obj.selfId;
         state.bots[con.id] = con;
         for (let {data, id } of obj.players) {
@@ -52,12 +53,6 @@ function init(con,state) {
     let ws = con.socket;
     let delay = Math.floor(Math.random() * 1000);
     
-    send(ws,{join: true});
-    
-    ws.addEventListener('message', (msg) => {
-        processMessage(msg,con,state);
-    });
-    
     if (config.NAME !== "") {
         send(ws,{chat: `/name ${config.NAME}`});
     }
@@ -66,6 +61,9 @@ function init(con,state) {
     
     send(con.socket,{type: "spawn"});
     
+    ws.addEventListener('message', (msg) => {
+        processMessage(msg,con,state);
+    });
     if (config.DO_STUFF)
         setTimeout(init_work,delay,con,ws,state);
 }
@@ -200,3 +198,195 @@ function init_work(con,ws,state) {
 }
 
 module.exports.init = init;
+bot.js
+/* jshint node: true, esversion: 11 */
+
+WebSocket = require("ws");
+// lite has better preofrmace in this usecase
+messagepack = require("msgpack-lite");
+express = require("express");
+
+config = require("./config.js");
+diag = require("./diag.js");
+connect = require("./connect.js");
+lib = require("./lib.js");
+behavior = require("./behavior.js");
+
+// helper functions and bindings
+dbg = (x) => console.info(x);
+send = lib.send;
+
+// shared state buffer
+let state = {players: {}, bots: {}, ping: null, deaths: 0};
+
+tx_total = 0;
+rx_total = 0;
+
+// Connect to server
+let cons = [];
+setInterval(connect.connect,1000,cons,behavior.init,state);
+
+// print stats
+setInterval(diag.getstats,500,cons,state);
+
+// start web server
+if (config.WEB_SERVER) {
+const app = express();
+const port =  config.WEB_SERVER_PORT;
+
+    app.get("/", (req, res) => {
+        res.send("This is the openbots web server. This can be used for uptime monitoring and preventing dyno/runner sleep in heroku/replit");
+    });
+    app.listen(port, () => {
+        console.log("internal web server http://localhost:${port}");
+    });
+}
+config.js
+/* jshint node: true, esversion: 11 */
+
+// Configuration options
+
+let config = {
+    BOT_COUNT: 5,
+    // ping interval should be 500 to resemble a player
+    PING_INTERVAl: 500,
+    // should be arroung 500 - 1000
+    // set to a low number (1) to cary out a chat flood
+    CHAT_INTERAVL: 1000,
+    // artifical latency added to pings
+    // set this to non zero to induce lag?
+    FAKE_LAG: 0,
+    // name the bots shold use. leave blank to not send a /name command
+    NAME: "OpenBot",
+    // Whenter the bots shold have active behavior
+    DO_STUFF: true,
+    // the names of the inputs for directions
+    MOVES: ["up", "right", "left", "down"],
+    // address of the game server (should start with "ws://")
+    ADDRESS: "ws://localhost:5000",
+    // messages the bots will send
+    CHATS: ["ICANHASBOT", "over 158 lines of code", "no monkeys in the loop", "KILL ALL HUMANS", "stay still for a moment", "lagggggggg", "[SEGMENTATION FAULT]", "jk", "let me pass", "[BIG RED BUTTON]", "100% artificial", "go watch a cat video", "https://github.com/10maurycy10/OpenBots"],
+    // Should the script have a web server
+    WEB_SERVER: false,
+    MOVE_RANDOM_WALK_TIME: 500,
+    DONT_ATTACK_SELF: true,
+    // the is how mutch the bot will reotate per second
+    ARROWING_ANGULAR_SPEED: 2.9,
+    SERVER_TICKS_MS: 16,
+    IGNORED_NAMES: {},
+    MIN_AIM_CYCLES: 6
+};
+
+// add some extra messages depending on platform
+if (process.platform == "linux") {
+    config.CHATS.push("Linux, and proud of it!");
+}
+if (process.platform == "freebsd" || process.platform == "openbsd") {
+    config.CHATS.push("What is this, BSD?");
+}
+if (process.platform == "win32") {
+    config.CHATS.push("WTF is this, MSDOS?");
+}
+if (process.platform == "darwin") {
+   config.CHATS.push("Careful, this computer is very expensive!");
+}
+// this one is specal for heroku
+config.WEB_SERVER_PORT = process.env.PORT || 3000;
+
+for (let envvar in process.env) {
+    if (envvar in config) {
+        if (process.env[envvar] !== "") {
+            config[envvar] = JSON.parse(process.env[envvar]);
+        }
+    }
+}
+
+module.exports = config;
+
+if (process.env.LOG_CONF) {
+    console.log(module.exports);
+}
+connect.js
+/* jshint node: true, esversion: 11, loopfunc: false */
+
+// buffer for connections
+// calback for connection
+// global state buffer
+module.exports.connect = (array,init,state) => {
+    for (let i = 0;i < config.BOT_COUNT;i++) {
+        if ((!array[i]) || (!array[i].open)) {
+            let ws = new WebSocket(config.ADDRESS);
+            let con = {socket: ws,id: null,open: true,init: false, x: null, y: null, angle: null};
+            ws.addEventListener("open", () => init(con, state)); // jshint ignore:line
+            array[i] = con;
+        }
+    }
+};
+diag.js
+/* jshint node: true, esversion: 11 */
+
+let rx_last = 0;
+let tx_last = 0;
+
+module.exports.getstats = (array,state) => {
+    let notconnected = 0;
+    let connected = 0;
+    let inited = 0;
+    let disconnected = 0;
+    
+    let i = 0;
+    while (i < config.BOT_COUNT) {
+        if (array[i]) {
+            connected ++;
+            if (!array[i].open) {
+                 disconnected++;
+            }
+            if (array[i].init) {
+                inited++;
+            }
+        } else {
+            notconnected++;
+        }
+        i++;
+    }
+    
+    let d_rx = rx_total - rx_last;
+    let d_tx = tx_total - tx_last;
+    
+    dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected} | TX ${d_tx*2} | RX ${d_rx*2} | PING ${state.ping} | DEATHS ${state.deaths}`);
+    
+    rx_last = rx_total;
+    tx_last = tx_total;
+};
+lib.js
+/* jshint node: true, esversion: 11 */
+
+// create a NoOp input state
+function createInput() {
+	return { up: false, right: false, left: false, down: false, arrowLeft: false, arrowRight: false, space: false };
+}
+
+module.exports.createInput = createInput;
+
+//utility to send data to server
+module.exports.send = (ws,x) => {
+    tx_total ++;
+    return ws.send(messagepack.encode(x));
+};
+
+// a small player info object
+module.exports.CPlayer = (pack) => { //the new keyword suck. avoid at all costs
+    // this avoids alocation
+    let init_player_data = (player,pack) => {
+        player.x = pack.x ?? player.x;
+        player.y = pack.y ?? player.y;
+        player.dying = pack.dying ?? player.dying;
+        player.radius = pack.radius ?? player.radius;
+        player.angle = pack.angle ?? player.angle;
+        player.name = pack.name ?? player.name;
+    };
+    let unpacked = {};
+    unpacked.snap = (pack) => init_player_data(unpacked,pack);
+    init_player_data(unpacked,pack);
+    return unpacked;
+};
