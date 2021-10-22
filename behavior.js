@@ -33,8 +33,10 @@ function processMessage(msg,con,state) {
     }
 	if (obj.type === 'leave') {
 		delete state.players[obj.id]
-        if (obj.id == con.id)
+        if (obj.id == con.id) {
             send(con.socket,{type: "spawn"})
+            state.deaths ++;
+        }
     }
     if (obj.pung != undefined) {
 		state.ping = Math.round((Date.now() - obj.pung) / 2)
@@ -91,12 +93,7 @@ function init_work(con,ws) {
         send(ws,{input: true, data: input})
     }
     
-    function update_aim(target_x, target_y) {
-        
-        if (config.DONT_AIM) {
-            arrow_direction = "arrowRight";
-            return
-        }
+    function update_aim(target_x, target_y, has_target) {
         
         if (!con.x) {
             return;
@@ -130,7 +127,7 @@ function init_work(con,ws) {
                 arrow_direction = null;
                 update_input()
                 con.aim_delay = false;
-                if (time_loading > 15) {
+                if (time_loading > 15 && has_target) {
                     loading = false;
                     if (aim_cycles > config.MIN_AIM_CYCLES) { 
                         aim_cycles = 0;
@@ -152,6 +149,7 @@ function init_work(con,ws) {
         let target_x = 0;
         let target_y = 0;
         let target_d = Number.MAX_VALUE;
+        let has_target = false;
         
         for (var id in state.players) {
             if (state.players.hasOwnProperty(id) && state.players[id] !== undefined && id !== con.id && !((id in state.bots) && config.DONT_ATTACK_SELF ) && !(state.players[id].name in config.IGNORED_NAMES)) {
@@ -163,11 +161,12 @@ function init_work(con,ws) {
                     target_d = d
                     target_x = player.x
                     target_y = player.y
+                    has_target = true;
                 }
             }
         }
         
-        update_aim(target_x,target_y)
+        update_aim(target_x,target_y,has_target)
     },100)
 
     let move_timer = setInterval(() => {

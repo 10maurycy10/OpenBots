@@ -26,7 +26,7 @@ module.exports.getstats = (array,state) => {
     let d_rx = rx_total - rx_last
     let d_tx = tx_total - tx_last
     
-    dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected} | TX ${d_tx*2} | RX ${d_rx*2} | PING ${state.ping}`)
+    dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected} | TX ${d_tx*2} | RX ${d_rx*2} | PING ${state.ping} | DEATHS ${state.deaths}`)
     
     rx_last = rx_total
     tx_last = tx_total
