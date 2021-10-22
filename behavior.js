@@ -121,7 +121,7 @@ function init_work(con,ws) {
         
         let angle_per_trip = config.ARROWING_ANGULAR_SPEED * seconds_round_trip
         
-        if (Math.abs(error) < (angle_per_trip+5)) {
+        if (Math.abs(error) < (angle_per_trip+10)) {
         
             let time_to_hold_input_ms = Math.abs(error / config.ARROWING_ANGULAR_SPEED * 1000)
             
