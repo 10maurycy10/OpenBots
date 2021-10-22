@@ -28,7 +28,7 @@ config = {
     ARROWING_ANGULAR_SPEED: 2.9,
     SERVER_TICKS_MS: 16,
     IGNORED_NAMES: {},
-    MIN_AIM_CYCLES: 3
+    MIN_AIM_CYCLES: 6
 }
 
 // add some extra messages depending on platform

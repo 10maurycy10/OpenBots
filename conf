@@ -1,0 +1,7 @@
+export CHATS='[]'
+export ADDRESS='"ws://localhost:5000"'
+export NAME='"meru"'
+export BOT_COUNT='1'
+export IGNORED_NAMES='{"[BOT]": true}'
+
+npm start
