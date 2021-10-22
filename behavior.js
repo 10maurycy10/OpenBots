@@ -71,7 +71,6 @@ function init_work(con,ws,state) {
     }, config.PING_INTERVAl);
     // SEND A CHAT
     let chat_timer = setInterval(() => {
-        dbg(config.CHATS)
         if (config.CHATS.length > 0) {
             send(ws,{
                 chat: config.CHATS[Math.floor(Math.random() * config.CHATS.length)]
