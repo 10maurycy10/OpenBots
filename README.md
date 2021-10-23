@@ -1,6 +1,6 @@
 # Open DArrows Bots
 
-A simple node js program to bot a darrows server.
+A not so simple node js program to bot a darrows server.
 
 configs are in config.js
 
