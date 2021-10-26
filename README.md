@@ -8,7 +8,9 @@ configs are in config.js
 
 the configs can be set with env vars.
 
-the most important config is ADDRESS, it should be set to "ws://darrows.herokuapp.com/" to bot the main server.
+the most important config is ADDRESS, it should be set to "wss://darrows-testing.herokuapp.com/" to bot the testing server.
+
+You can use "wss://darrows-testing.herokuapp.com/" to bot the main server, but be warned: the admin has bean known to retaliate.
 
 ## running
 
