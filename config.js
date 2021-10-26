@@ -18,7 +18,8 @@ let config = {
     DO_STUFF: true,
     // the names of the inputs for directions
     MOVES: ["up", "right", "left", "down"],
-    // address of the game server (should start with "ws://")
+    // address of the game server (should start with "ws://" ot "wss://")
+    // example: "wss://darrows-testing.herokuapp.com"
     ADDRESS: "ws://localhost:5000",
     // messages the bots will send
     CHATS: ["ICANHASBOT", "over 158 lines of code", "no monkeys in the loop", "KILL ALL HUMANS", "stay still for a moment", "lagggggggg", "[SEGMENTATION FAULT]", "jk", "let me pass", "[BIG RED BUTTON]", "100% artificial", "go watch a cat video", "https://github.com/10maurycy10/OpenBots"],
