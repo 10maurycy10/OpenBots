@@ -52,7 +52,7 @@ function init(con,state) {
     let ws = con.socket;
     let delay = Math.floor(Math.random() * 1000);
     
-    send(ws,{join: true});
+    send(ws,{joinGame: true});
     
     ws.addEventListener('message', (msg) => {
         processMessage(msg,con,state);
