@@ -29,7 +29,7 @@ module.exports.getstats = (array,state) => {
     let d_tx = tx_total - tx_last;
     
     dbg(`Connected ${connected} | inited ${inited} | kicked ${disconnected} | TX ${d_tx*2} | RX ${d_rx*2} | PING ${state.ping} | DEATHS ${state.deaths}`);
-    
+//    dbg(state.players);
     rx_last = rx_total;
     tx_last = tx_total;
 };

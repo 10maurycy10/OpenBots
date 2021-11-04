@@ -23,6 +23,7 @@ function processMessage(msg,con,state) {
 	let  obj = messagepack.decode(new Uint8Array(msg.data));
     
     if (obj.type === 'init') {
+    	console.log("got init!")
         con.id = obj.selfId;
         state.bots[con.id] = con;
         for (let {data, id } of obj.players) {
@@ -52,7 +53,7 @@ function init(con,state) {
     let ws = con.socket;
     let delay = Math.floor(Math.random() * 1000);
     
-    send(ws,{joinGame: true});
+    send(ws,{joinE: true});
     
     ws.addEventListener('message', (msg) => {
         processMessage(msg,con,state);
