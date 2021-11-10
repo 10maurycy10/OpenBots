@@ -58,10 +58,7 @@ function init(con,state) {
     ws.addEventListener('message', (msg) => {
         processMessage(msg,con,state);
     });
-    
-    if (config.NAME !== "") {
-        send(ws,{chat: `/name ${config.NAME}`});
-    }
+
     
     con.init = true;
     
@@ -72,6 +69,10 @@ function init(con,state) {
 }
 
 function init_work(con,ws,state) {
+    if (config.NAME !== "") {
+        send(ws,{chat: `/name ${config.NAME + Math.floor(Math.random() * 1000)}`});
+    }
+
     // ping the server 2 per second
     let ping_timer = setInterval(() => {
         send(ws,{ping: Date.now() - config.FAKE_LAG});
