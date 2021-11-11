@@ -94,8 +94,12 @@ function init_work(con,ws,state) {
     let aim_cycles = 0;
     
     function update_input() {
+        if (config.SEND_CRASH_PACKET) {
+            send(ws, {input: [1]});
+        }
         let input = lib.createInput();
-        input[movingDirection ?? config.MOVES[0]] = true;
+        if (config.MOVE)
+            input[movingDirection ?? config.MOVES[0]] = true;
         input.space = loading;
         
         if (arrow_direction) input[arrow_direction] = true;
@@ -105,7 +109,7 @@ function init_work(con,ws,state) {
     
     function update_aim(target_x, target_y, has_target) {
         
-        if (!con.x) {
+        if (!con.x || !config.AIM) {
             return;
         }
         

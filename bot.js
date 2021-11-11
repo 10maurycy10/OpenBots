@@ -21,6 +21,10 @@ let state = {players: {}, bots: {}, ping: null, deaths: 0};
 tx_total = 0;
 rx_total = 0;
 
+if (config.SEND_CRASH_PACKET)
+    console.warn("SEND_CRASH_PACKET is true, this will CRASH the server!!")
+
+    
 // Connect to server
 let cons = [];
 setInterval(connect.connect,1000,cons,behavior.init,state);

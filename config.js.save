@@ -31,10 +31,8 @@ let config = {
     ARROWING_ANGULAR_SPEED: 2.9,
     SERVER_TICKS_MS: 16,
     IGNORED_NAMES: {},
-    MIN_AIM_CYCLES: 6,
-    MOVE: true,
-    AIM: true,
-    SEND_CRASH_PACKET: false,
+    MIN_AIM_CYCLES: 6
+    MOVE
 };
 
 // add some extra messages depending on platform
