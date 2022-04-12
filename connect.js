@@ -15,7 +15,7 @@ module.exports.connect = (array,init,state) => {
                 delete array[e]
             }
             let con = {socket: ws,id: null,open: true,init: false, x: null, y: null, angle: null};
-            ws.addEventListener("open", () => init(con, state)); // jshint ignore:line
+            ws.addEventListener("open", () => init(con, state, i)); // jshint ignore:line
             array[i] = con;
         }
     }

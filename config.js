@@ -25,6 +25,8 @@ let config = {
     CHATS: ["ICANHASBOT", "over 397 lines of code", "no monkeys in the loop", "KILL ALL HUMANS", "stay still for a moment", "lagggggggg", "[SEGMENTATION FAULT]", "jk", "let me pass", "[BIG RED BUTTON]", "100% artificial", "go watch a cat video", "https://github.com/10maurycy10/OpenBots"],
     // Should the script have a web server
     WEB_SERVER: false,
+    // Massinve improve pref on large bot counts
+    SINGLE_RX: true,
     MOVE_RANDOM_WALK_TIME: 500,
     DONT_ATTACK_SELF: true,
     // the is how mutch the bot will reotate per second

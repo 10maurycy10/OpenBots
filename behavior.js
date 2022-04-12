@@ -2,6 +2,7 @@
 
 
 function update_players(state,players,con) {
+    
     for (let pack of players) {
         if (!state.players[pack.id]) {
             state.players[pack.id] = lib.CPlayer(pack);
@@ -20,6 +21,10 @@ function update_players(state,players,con) {
 
 function processMessage(msg,con,state) {
     rx_total++;
+    
+    if (!con.do_rx)
+        return;
+    
 	let  obj = messagepack.decode(new Uint8Array(msg.data));
     
     if (obj.type === 'init') {
@@ -29,19 +34,30 @@ function processMessage(msg,con,state) {
         for (let {data, id } of obj.players) {
 			state.players[id] = lib.CPlayer(data);
 		}
+		if (con.conid != 0 && config.SINGLE_RX)
+            con.do_rx = false
     }
-    if (obj.type === "state") {
-        update_players(state, obj.data.players, con);
+    if (obj.d) {
+        update_players(state, obj.d.p, con);
     }
     if (obj.type === "newPlayer") {
 		state.players[obj.id] = lib.CPlayer(obj.player, obj.id === con.id);
     }
 	if (obj.type === 'leave') {
-		delete state.players[obj.id];
-        if (obj.id == con.id) {
-            send(con.socket,{type: "spawn"});
-            state.deaths ++;
+        if (!config.SINGLE_RX) {
+            if (obj.id == con.id) {
+                send(con.socket,{type: "spawn"});
+                state.deaths ++;
+            }
+        } else {
+            console.log(state.cons)
+            if (state.bots[obj.id]) {
+                let pcon = state.bots[obj.id];
+                send(pcon.socket,{type: "spawn"});
+                state.deaths ++
+            }
         }
+        delete state.players[obj.id];
     }
     if (obj.pung != undefined) {
 		state.ping = Math.round((Date.now() - obj.pung) / 2);
@@ -49,11 +65,11 @@ function processMessage(msg,con,state) {
 }
 
 // initalze the connection
-function init(con,state) {
+function init(con,state,conid) {
     let ws = con.socket;
     let delay = Math.floor(Math.random() * 1000);
     
-    send(ws,{joinE: true});
+    send(ws,{joinE: true, character: "Default"});
     
     ws.addEventListener('message', (msg) => {
         processMessage(msg,con,state);
@@ -61,6 +77,8 @@ function init(con,state) {
 
     
     con.init = true;
+    con.do_rx = true;
+    con.conid = conid;
     
     send(con.socket,{type: "spawn"});
     
@@ -69,6 +87,7 @@ function init(con,state) {
 }
 
 function init_work(con,ws,state) {
+    
     if (config.NAME !== "") {
         send(ws,{chat: `/name ${config.NAME + Math.floor(Math.random() * 1000)}`});
     }
@@ -108,6 +127,13 @@ function init_work(con,ws,state) {
     }
     
     function update_aim(target_x, target_y, has_target) {
+        
+        if (state.players[con.id] && config.SINGLE_RX) {
+            con.x = state.players[con.id].x ?? null;
+            con.y = state.players[con.id].y ?? null;
+            con.angle = state.players[con.id].angle ?? null;
+            con.dead = state.players[con.id].dead ?? null;
+        }
         
         if (!con.x || !config.AIM) {
             return;

@@ -15,8 +15,10 @@ behavior = require("./behavior.js");
 dbg = (x) => console.info(x);
 send = lib.send;
 
+let cons = [];
+
 // shared state buffer
-let state = {players: {}, bots: {}, ping: null, deaths: 0};
+let state = {players: {}, bots: {}, ping: null, deaths: 0, cons: cons};
 
 tx_total = 0;
 rx_total = 0;
@@ -26,7 +28,6 @@ if (config.SEND_CRASH_PACKET)
 
     
 // Connect to server
-let cons = [];
 setInterval(connect.connect,1000,cons,behavior.init,state);
 
 // print stats
