@@ -50,7 +50,6 @@ function processMessage(msg,con,state) {
                 state.deaths ++;
             }
         } else {
-            console.log(state.cons)
             if (state.bots[obj.id]) {
                 let pcon = state.bots[obj.id];
                 send(pcon.socket,{type: "spawn"});
