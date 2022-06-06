@@ -6,11 +6,13 @@ configs are in config.js
 
 ## configuring
 
-the configs can be set with env vars.
+the configs can be set with env vars. The configs are json, so strings need to wraped in both single and double qoutes:
 
-the most important config is ADDRESS, it should be set to "wss://darrows-testing.herokuapp.com/" to bot the testing server.
+```
+ADDRESS='"wss://darrows.zerotixdev.repl.co"' ...
+```
 
-You can use "wss://darrows-testing.herokuapp.com/" to bot the main server, but be warned: the admin has bean known to retaliate.
+the most important config is ADDRESS, it should be set to "wss://darrows.zerotixdev.repl.co/" to bot the server.
 
 ## running
 
