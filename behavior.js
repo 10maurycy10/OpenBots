@@ -134,6 +134,9 @@ function processMessage(msg, con, state) {
 	if (obj.pung != undefined) {
 		state.ping = Math.round((Date.now() - obj.pung) / 2);
 	}
+	if (obj.serverTickMs) {
+		state.serverTickMs = obj.serverTickMs
+	}
 }
 
 // initalze the connection
@@ -189,7 +192,7 @@ function init_work(con, ws, state) {
 			send(ws, {input: [1]}, state);
 		}
 		let input = lib.createInput();
-		if (state.config.MOVE) input[movingDirection ?? state.config.MOVES[0]] = true;
+		if (state.config.MOVE && movingDirection) input[movingDirection] = true;
 		input.space = loading;
 
 		if (arrow_direction) input[arrow_direction] = true;
@@ -224,7 +227,7 @@ function init_work(con, ws, state) {
 		// dont attemt good aim if ping not known
 		if (state.ping === null) return;
 
-		let seconds_round_trip = (state.ping * 2 + state.config.SERVER_TICKS_MS) / 1000;
+		let seconds_round_trip = (state.ping * 2 + 30) / 1000;
 
 		let angle_per_trip = state.config.ARROWING_ANGULAR_SPEED * seconds_round_trip;
 
@@ -260,9 +263,8 @@ function init_work(con, ws, state) {
 		let target_d = Number.MAX_VALUE;
 		let has_target = false;
 
-		for (var id in Object.keys(state.players)) {
+		for (var id of Object.keys(state.players)) {
 			if (
-				state.players[id] !== undefined &&
 				id !== con.id &&
 				!(id in state.bots && state.config.DONT_ATTACK_SELF) &&
 				!(state.players[id].name in state.config.IGNORED_NAMES)
@@ -282,7 +284,6 @@ function init_work(con, ws, state) {
 
 		if (has_target) {
 			if (path_stale) {
-				console.log(con.id);
 				path = pathfind(
 					Math.floor(con.x / PATHING_SCALE),
 					Math.floor(con.y / PATHING_SCALE),
@@ -298,7 +299,7 @@ function init_work(con, ws, state) {
 	}, 100);
 
 	let move_timer = setInterval(() => {
-		if (path == null) {
+		if (path == null || path == []) {
 			// if we dont have a path, fallback to random walk
 			movingDirection =
 				state.config.MOVES[Math.floor(Math.random() * state.config.MOVES.length)];
@@ -321,7 +322,7 @@ function init_work(con, ws, state) {
 				else if (moveto[0] < path_x) movingDirection = "left";
 				else if (moveto[1] > path_y) movingDirection = "down";
 				else if (moveto[1] < path_y) movingDirection = "up";
-				else movingDirection = "none";
+				else movingDirection = "null";
 			} else {
 				console.log("not on path!");
 				path_stale = true;

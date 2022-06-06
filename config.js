@@ -45,7 +45,6 @@ let config = {
 	DONT_ATTACK_SELF: true,
 	// the is how mutch the bot will reotate per second
 	ARROWING_ANGULAR_SPEED: 2.9,
-	SERVER_TICKS_MS: 16,
 	IGNORED_NAMES: {},
 	MIN_AIM_CYCLES: 6,
 	MOVE: true,

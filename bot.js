@@ -11,7 +11,7 @@ const behavior = require("./behavior.js");
 let cons = [];
 
 // shared state buffer
-let state = {players: {}, bots: {}, ping: null, deaths: 0, cons: cons, config, rx_total: 0, tx_total: 0};
+let state = {players: {}, bots: {}, ping: null, deaths: 0, cons: cons, config, rx_total: 0, tx_total: 0, serverTickMs: 16};
 
 if (config.SEND_CRASH_PACKET)
 	console.warn("SEND_CRASH_PACKET is true, this will CRASH the server!");
