@@ -27,7 +27,7 @@ let config = {
     WEB_SERVER: false,
     // Massinve improve pref on large bot counts
     SINGLE_RX: true,
-    MOVE_RANDOM_WALK_TIME: 500,
+    MOVE_RANDOM_WALK_TIME: 10,
     DONT_ATTACK_SELF: true,
     // the is how mutch the bot will reotate per second
     ARROWING_ANGULAR_SPEED: 2.9,

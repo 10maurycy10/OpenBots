@@ -1,5 +1,8 @@
 /* jshint node: true, esversion: 11 */
-
+const pather = require("./path.js")
+const lib = require('./lib.js')
+const msgpack = require('msgpack-lite')
+const PATHING_SCALE=50;
 
 function update_players(state,players,con) {
     
@@ -18,6 +21,73 @@ function update_players(state,players,con) {
         con.dead = state.players[con.id].dead ?? null;
     }
 }
+
+// (re)Compute a lookuptable for pathfinding
+function rebuild_pathing_table(state) {
+	if (!state.arena)
+		return
+
+	console.log("rebuilding pathing table")
+	var table_width = Math.ceil(state.arena.width / PATHING_SCALE);
+	var table_height = Math.ceil(state.arena.height / PATHING_SCALE);
+
+	console.log(table_width, table_height, state.obstacles)
+
+	// Initalize the table with all trues...
+	var table = Array.from(Array(table_width), () => new Array(table_height));
+	for (var x = 0; x < table_width; x++)
+		for (var y = 0; y < table_height; y++)
+			table[x][y] = true
+
+	// for all obsticles
+	for (var obs of state.obstacles) {
+		// if not a hardpoint...
+		if (obs.type != "point") {
+			var obs_start_x = Math.floor(obs.x / PATHING_SCALE);
+			var obs_start_y = Math.floor(obs.y / PATHING_SCALE);
+			var obs_end_x = Math.ceil(obs.width / PATHING_SCALE) + obs_start_x;
+			var obs_end_y = Math.ceil(obs.height / PATHING_SCALE) + obs_start_y;
+			for (var x = obs_start_x; obs_end_x > x; x++)
+				for (var y = obs_start_y; obs_end_y > y; y++)
+					if (x < table_height && x > -1 && y < table_width && y > -1)
+						table[x][y] = false;
+		}
+	}
+
+	for (var x = 0; x < table_width; x++) {
+		var buf = "|"
+		for (var y = 0; table_height > y; y++) {
+			buf = buf.concat((table[x][y])?" ":"#")
+		}
+		console.log(buf + '|')
+	}
+	state.pathingtable = table
+}
+
+function pathfind(startx, starty, endx, endy, state) {
+	if (!state.pathingtable)
+		return;
+
+	function moves(node) {
+		return [
+			[node[0]-1, node[1]],
+			[node[0], node[1]+1],
+			[node[0]+1, node[1]],
+			[node[0], node[1]-1],
+		]
+	} 
+	function is_goal(node) {
+		return (node[0] == endx) && (node[1]==endy)
+	}
+	function is_passable(node) {
+		if (node[0] < 0 || node[0] >= state.pathingtable.length)
+			return false
+		if (node[1] < 0 || node[1] >= state.pathingtable[0].length)
+			return false
+		return state.pathingtable[node[0]][node[1]]
+	}
+	return pather([startx, starty], moves, is_passable, is_goal)
+} 
 
 function processMessage(msg,con,state) {
     rx_total++;
@@ -43,7 +113,17 @@ function processMessage(msg,con,state) {
     if (obj.type === "newPlayer") {
 		state.players[obj.id] = lib.CPlayer(obj.player, obj.id === con.id);
     }
-	if (obj.type === 'leave') {
+    if (obj.obstacles) {
+	if (obj.obstacles != state.obstacles) {
+		state.obstacles = obj.obstacles;
+		rebuild_pathing_table(state);
+	}
+    }
+    if (obj.arena) {
+	state.arena = obj.arena;
+	rebuild_pathing_table(state);
+    }
+if (obj.type === 'leave') {
         if (!config.SINGLE_RX) {
             if (obj.id == con.id) {
                 send(con.socket,{type: "spawn"});
@@ -79,7 +159,7 @@ function init(con,state,conid) {
     con.do_rx = true;
     con.conid = conid;
     
-    send(con.socket,{type: "spawn"});
+    //send(con.socket,{type: "spawn"});
     
     if (config.DO_STUFF)
         setTimeout(init_work,delay,con,ws,state);
@@ -110,6 +190,8 @@ function init_work(con,ws,state) {
     let can_fire = false;
     let time_loading = 0;
     let aim_cycles = 0;
+    let path = [];
+    let path_stale = true;
     
     function update_input() {
         if (config.SEND_CRASH_PACKET) {
@@ -118,7 +200,7 @@ function init_work(con,ws,state) {
         let input = lib.createInput();
         if (config.MOVE)
             input[movingDirection ?? config.MOVES[0]] = true;
-        input.space = loading;
+	input.space = loading;
         
         if (arrow_direction) input[arrow_direction] = true;
         
@@ -204,12 +286,53 @@ function init_work(con,ws,state) {
                 }
             }
         }
+
+	if (has_target) {
+		    if (path_stale) {
+			console.log(con.id)
+			path = pathfind(
+			    Math.floor(con.x/PATHING_SCALE),
+			        Math.floor(con.y/PATHING_SCALE),
+			        Math.floor(target_x/PATHING_SCALE), 
+				Math.floor(target_y/PATHING_SCALE),
+				state
+			)
+			if (path != null)
+			    path_stale = false
+		    }
+
+	}
         
         update_aim(target_x,target_y,has_target);
     },100);
 
     let move_timer = setInterval(() => {
-        movingDirection = config.MOVES[Math.floor(Math.random() * config.MOVES.length)];
+	if (path == null) { // if we dont have a path, fallback to random walk
+		movingDirection = config.MOVES[Math.floor(Math.random() * config.MOVES.length)];
+		console.log("falling back to random walk")
+		update_input();
+		return;
+	}
+
+	var path_x = Math.floor(con.x / PATHING_SCALE);
+	var path_y = Math.floor(con.y / PATHING_SCALE);
+        //movingDirection = config.MOVES[Math.floor(Math.random() * config.MOVES.length)];
+	var path_idx = path.findIndex((node) => node[0] == path_x && node[1] == path_y);
+	if (path_idx == -1) 
+	    path_stale = true
+	else {
+		if (path_idx != (path.length - 1)) {
+			var moveto = path[path_idx + 1];
+			if (moveto[0] > path_x) movingDirection = "right"
+			else if (moveto[0] < path_x) movingDirection = "left"
+			else if (moveto[1] > path_y) movingDirection = "down"
+			else if (moveto[1] < path_y) movingDirection = "up"
+			else movingDirection = "none"
+		} else {
+			console.log("not on path!")
+			path_stale = true
+		}
+	}
         update_input();
     },config.MOVE_RANDOM_WALK_TIME);
     
