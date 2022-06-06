@@ -1,47 +1,38 @@
 /* jshint node: true, esversion: 11 */
 
-WebSocket = require("ws");
 // lite has better preofrmace in this usecase
-messagepack = require("msgpack-lite");
-express = require("express");
+const express = require("express");
 
-config = require("./config.js");
-diag = require("./diag.js");
-connect = require("./connect.js");
-lib = require("./lib.js");
-behavior = require("./behavior.js");
-
-// helper functions and bindings
-dbg = (x) => console.info(x);
-send = lib.send;
+const config = require("./config.js");
+const diag = require("./diag.js");
+const connect = require("./connect.js");
+const behavior = require("./behavior.js");
 
 let cons = [];
 
 // shared state buffer
-let state = {players: {}, bots: {}, ping: null, deaths: 0, cons: cons};
-
-tx_total = 0;
-rx_total = 0;
+let state = {players: {}, bots: {}, ping: null, deaths: 0, cons: cons, config, rx_total: 0, tx_total: 0};
 
 if (config.SEND_CRASH_PACKET)
-    console.warn("SEND_CRASH_PACKET is true, this will CRASH the server!!")
+	console.warn("SEND_CRASH_PACKET is true, this will CRASH the server!");
 
-    
 // Connect to server
-setInterval(connect.connect,1000,cons,behavior.init,state);
+setInterval(connect.connect, 1000, cons, behavior.init, state, config);
 
 // print stats
-setInterval(diag.getstats,500,cons,state);
+setInterval(diag.getstats, 500, cons, state);
 
 // start web server
 if (config.WEB_SERVER) {
-const app = express();
-const port =  config.WEB_SERVER_PORT;
+	const app = express();
+	const port = config.WEB_SERVER_PORT;
 
-    app.get("/", (req, res) => {
-        res.send("This is the openbots web server. This can be used for uptime monitoring and preventing dyno/runner sleep in heroku/replit");
-    });
-    app.listen(port, () => {
-        console.log("internal web server http://localhost:${port}");
-    });
+	app.get("/", (req, res) => {
+		res.send(
+			"This is the openbots web server. This can be used for uptime monitoring and preventing dyno/runner sleep in heroku/replit"
+		);
+	});
+	app.listen(port, () => {
+		console.log("internal web server http://localhost:${port}");
+	});
 }
