@@ -43,8 +43,8 @@ function rebuild_pathing_table(state) {
 		if (obs.type != "point") {
 			var obs_start_x = Math.floor(obs.x / PATHING_SCALE);
 			var obs_start_y = Math.floor(obs.y / PATHING_SCALE);
-			var obs_end_x = Math.ceil(obs.width / PATHING_SCALE) + obs_start_x;
-			var obs_end_y = Math.ceil(obs.height / PATHING_SCALE) + obs_start_y;
+			var obs_end_x = Math.ceil((obs.width + obs.x) / PATHING_SCALE);
+			var obs_end_y = Math.ceil((obs.height + obs.y) / PATHING_SCALE);
 			for (var x = obs_start_x; obs_end_x > x; x++)
 				for (var y = obs_start_y; obs_end_y > y; y++)
 					if (x < table_height && x > -1 && y < table_width && y > -1)
@@ -52,9 +52,9 @@ function rebuild_pathing_table(state) {
 		}
 	}
 
-	for (var x = 0; x < table_width; x++) {
+	for (var y = 0; y < table_height; y++) {
 		var buf = "|";
-		for (var y = 0; table_height > y; y++) {
+		for (var x = 0; table_width > x; x++) {
 			buf = buf.concat(table[x][y] ? " " : "#");
 		}
 		console.log(buf + "|");
@@ -86,10 +86,12 @@ function pathfind(startx, starty, endx, endy, state) {
 
 function processMessage(msg, con, state) {
 	state.rx_total++;
+	let obj = messagepack.decode(new Uint8Array(msg.data));
+
+	if (obj.hit)
+		state.kills++
 
 	if (!con.do_rx) return;
-
-	let obj = messagepack.decode(new Uint8Array(msg.data));
 
 	if (obj.type === "init") {
 		console.log("got init!");
